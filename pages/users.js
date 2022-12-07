@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Styles from "../styles/pages/Users.module.scss";
-import { Input, Button } from "antd";
+import { Input, Button, Modal, Avatar, Row, Col } from "antd";
 import { BsSearch } from "react-icons/bs";
 import UserList from "../components/UserList";
 import { useState, useEffect } from "react";
@@ -8,6 +8,29 @@ import { useState, useEffect } from "react";
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [userList, setUserList] = useState([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState({});
+  const [imageUrl, setImageUrl] = useState("");
+
+  const showModal = (data) => {
+    setIsModalOpen(true);
+    console.log(data);
+    setData(data);
+
+    // fetch user image
+    fetch(`https://jsonplaceholder.typicode.com/photos/${data.id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setImageUrl(data.url);
+      });
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setImageUrl("");
+  };
 
   const onSearch = (value) => {
     console.log(value);
@@ -42,19 +65,20 @@ export default function Users() {
     setUserList(updatedUsers);
   };
 
+  const fetchData = async () => {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    const data = await response.json();
+    // add a disable property to each user
+    const users = data.map((user) => ({ ...user, disabled: false }));
+    console.log(users);
+    setUsers(users);
+    setUserList(users);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      const data = await response.json();
-      // add a disable property to each user
-      const users = data.map((user) => ({ ...user, disabled: false }));
-      console.log(users);
-      setUsers(users);
-      setUserList(users);
-    };
-    fetchData();
+    if (users.length === 0) {
+      fetchData();
+    }
   }, []);
 
   return (
@@ -74,7 +98,33 @@ export default function Users() {
         />
         <Button size="large">Search</Button>
       </div>
-      <UserList users={users} onSwitchChange={onSwitchChange} />
+      <UserList
+        users={users}
+        onSwitchChange={onSwitchChange}
+        showModal={showModal}
+      />
+      <Modal
+        title="User Details"
+        open={isModalOpen}
+        footer={null}
+        onCancel={handleCancel}
+        destroyOnClose={true}
+      >
+        <Row justify={"center"}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Avatar size={100} src={imageUrl} />
+            <b>{data.name}</b>
+            <span style={{ color: "#0c0c0c" }}>@{data.username}</span>
+            <span>{data.phone}</span>
+          </div>
+        </Row>
+      </Modal>
     </div>
   );
 }
