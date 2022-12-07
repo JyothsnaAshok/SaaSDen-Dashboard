@@ -1,0 +1,24 @@
+.userListWrapper {
+  padding: 2rem;
+  padding-top: 4rem;
+
+  :global {
+    .ant-list {
+      background-color: #fff;
+    }
+    .ant-list-header {
+      background-color: #d9dad9;
+      border-bottom: 1px solid #4680f0;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #282828;
+    }
+  }
+
+  .userListItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

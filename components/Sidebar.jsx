@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 export default function Sidebar() {
   const router = useRouter();
   const { pathname } = router;
-  console.log(pathname);
   const path = pathname.slice(1);
 
   // check if the path is the same as the link, the apply active style else apply inactive style

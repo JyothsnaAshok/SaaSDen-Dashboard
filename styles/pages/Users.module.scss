@@ -1,0 +1,42 @@
+.container {
+  width: 100%;
+
+  .header {
+    background-color: #fff;
+    border-top: 1px solid #4680f0;
+    border-bottom: 1px solid #4680f0;
+    margin-top: 1rem;
+    width: 100% !important;
+    display: flex;
+    padding: 2rem;
+    align-items: center;
+    justify-content: space-between;
+
+    .pageHeading {
+      color: #294b9a;
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin-right: 2rem;
+    }
+
+    :global {
+      .ant-input-affix-wrapper {
+        margin-right: 2rem !important;
+        background-color: #f0f3f9;
+        border: none;
+      }
+      .ant-input {
+        background-color: #f0f3f9;
+      }
+      .ant-btn {
+        background-color: #f0f3f9;
+        color: #6d6d6f;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+    }
+  }
+}
