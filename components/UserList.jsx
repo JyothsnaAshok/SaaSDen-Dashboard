@@ -3,11 +3,17 @@ import { List, Typography, Switch, Row } from "antd";
 import Styles from "../styles/components/UserList.module.scss";
 import { useState } from "react";
 
-export default function UserList({ users, onSwitchChange, showModal }) {
+export default function UserList({
+  users,
+  onSwitchChange,
+  showModal,
+  header,
+  group = false,
+}) {
   return (
     <div className={Styles.userListWrapper}>
       <List
-        header={<div>User List</div>}
+        header={<div>{header}</div>}
         bordered
         dataSource={users}
         renderItem={(item) => (
@@ -15,7 +21,7 @@ export default function UserList({ users, onSwitchChange, showModal }) {
             <div className={Styles.userListItem}>
               {/* show disabled property of user */}
               <div
-                onClick={() => showModal(item)}
+                onClick={() => !group && showModal(item.id)}
                 style={{ cursor: "pointer" }}
               >
                 {item.disabled ? (
@@ -24,13 +30,15 @@ export default function UserList({ users, onSwitchChange, showModal }) {
                   <div>{item.name}</div>
                 )}
               </div>
-              <div>
-                {/* change disabled to true for that user on switch change */}
-                <Switch
-                  checked={item.disabled}
-                  onChange={(checked) => onSwitchChange(checked, item.id)}
-                />
-              </div>
+              {!group && (
+                <div>
+                  {/* change disabled to true for that user on switch change */}
+                  <Switch
+                    checked={item.disabled}
+                    onChange={(checked) => onSwitchChange(checked, item.id)}
+                  />
+                </div>
+              )}
             </div>
           </List.Item>
         )}

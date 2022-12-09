@@ -3,28 +3,43 @@ import Styles from "../styles/pages/Users.module.scss";
 import { Input, Button, Modal, Avatar, Row, Col } from "antd";
 import { BsSearch } from "react-icons/bs";
 import UserList from "../components/UserList";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
+import useUsers from "../hooks/users";
+
+const photoCache = {};
 
 export default function Users() {
+  const { userData, isLoading, error } = useUsers();
+
   const [users, setUsers] = useState([]);
   const [userList, setUserList] = useState([]);
+
+  // setstate only after the data is fetched
+  useEffect(() => {
+    if (userData.length) {
+      setUsers(userData);
+      setUserList(userData);
+    }
+  }, [userData]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState({});
   const [imageUrl, setImageUrl] = useState("");
 
-  const showModal = (data) => {
+  const showModal = async (id) => {
+    const user = users.find((user) => user.id === id);
+    setData(user);
+    if (photoCache[id]) {
+      setImageUrl(photoCache[id]);
+    } else {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/photos/${id}`
+      );
+      const data = await response.json();
+      setImageUrl(data.url);
+      photoCache[id] = data.url;
+    }
     setIsModalOpen(true);
-    console.log(data);
-    setData(data);
-
-    // fetch user image
-    fetch(`https://jsonplaceholder.typicode.com/photos/${data.id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setImageUrl(data.url);
-      });
   };
 
   const handleCancel = () => {
@@ -33,12 +48,11 @@ export default function Users() {
   };
 
   const onSearch = (value) => {
-    console.log(value);
     // filter users by name
     const filteredUsers = userList.filter((user) =>
       user.name.toLowerCase().includes(value.toLowerCase())
     );
-    console.log(filteredUsers);
+
     setUsers(filteredUsers);
   };
 
@@ -49,7 +63,6 @@ export default function Users() {
       }
       return user;
     });
-    console.log(updatedUsers);
     // sort users by disabled property
     updatedUsers.sort((a, b) => {
       if (a.disabled && !b.disabled) {
@@ -60,26 +73,13 @@ export default function Users() {
       }
       return 0;
     });
-    console.log(updatedUsers);
     setUsers(updatedUsers);
     setUserList(updatedUsers);
   };
 
-  const fetchData = async () => {
-    const response = await fetch("https://jsonplaceholder.typicode.com/users");
-    const data = await response.json();
-    // add a disable property to each user
-    const users = data.map((user) => ({ ...user, disabled: false }));
-    console.log(users);
-    setUsers(users);
-    setUserList(users);
-  };
-
-  useEffect(() => {
-    if (users.length === 0) {
-      fetchData();
-    }
-  }, []);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={Styles.container}>
@@ -99,6 +99,7 @@ export default function Users() {
         <Button size="large">Search</Button>
       </div>
       <UserList
+        header={"User List"}
         users={users}
         onSwitchChange={onSwitchChange}
         showModal={showModal}
